@@ -47,12 +47,13 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } f
 
 // ⚠️ REPLACE WITH YOUR FIREBASE CONFIG ⚠️
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAb0EDY5NDUr4tocYh_dV6mMiw0Z9F37TA",
+  authDomain: "photos-6e67c.firebaseapp.com",
+  projectId: "photos-6e67c",
+  storageBucket: "photos-6e67c.firebasestorage.app",
+  messagingSenderId: "683403133965",
+  appId: "1:683403133965:web:196b07e5e18e8429bb0144",
+  measurementId: "G-FTRFE4CS5J"
 };
 
 // Initialize Firebase

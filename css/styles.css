@@ -1,0 +1,238 @@
+/* PhotoVault - Custom Styles */
+
+/* Masonry Grid Layout */
+.masonry-grid {
+    columns: 2;
+    column-gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .masonry-grid { columns: 3; }
+}
+
+@media (min-width: 1024px) {
+    .masonry-grid { columns: 4; }
+}
+
+@media (min-width: 1280px) {
+    .masonry-grid { columns: 5; }
+}
+
+.masonry-grid .media-card {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+}
+
+/* Media Card */
+.media-card {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.media-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
+}
+
+.media-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.media-card:hover img {
+    transform: scale(1.05);
+}
+
+
+/* Card Overlay */
+.media-card .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1rem;
+}
+
+.media-card:hover .card-overlay {
+    opacity: 1;
+}
+
+.card-overlay .card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-overlay .card-actions button {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.card-overlay .card-actions button:hover {
+    background: rgba(255,255,255,0.4);
+}
+
+/* Navigation Items */
+.nav-item {
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.dark .nav-item:hover {
+    background: #1f2937;
+    color: #f9fafb;
+}
+
+.nav-item.active {
+    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    color: #4f46e5;
+    font-weight: 600;
+}
+
+.dark .nav-item.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1));
+    color: #a5b4fc;
+}
+
+/* Lightbox */
+#lightbox {
+    animation: fadeIn 0.3s ease;
+}
+
+#lightbox img {
+    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Toast Animation */
+.toast-visible {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+}
+
+/* Loading Skeleton */
+.skeleton {
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 1rem;
+}
+
+.dark .skeleton {
+    background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%);
+    background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #374151;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
+}
+
+/* Drag & Drop Zone */
+.drop-active {
+    border: 3px dashed #6366f1 !important;
+    background: rgba(99, 102, 241, 0.05) !important;
+}
+
+/* Image loading animation */
+.img-loading {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.img-loaded {
+    opacity: 1;
+}
+
+/* Selection checkbox */
+.select-check {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.5rem;
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(4px);
+    border: 2px solid rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.media-card:hover .select-check {
+    opacity: 1;
+}
+
+.select-check.selected {
+    opacity: 1;
+    background: #6366f1;
+    border-color: #6366f1;
+}

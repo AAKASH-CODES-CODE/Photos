@@ -47,10 +47,10 @@ const firebaseConfig = {
   measurementId: "G-FTRFE4CS5J"
 };
 
-// ⚠️ REPLACE WITH YOUR CLOUDINARY CONFIG ⚠️
+// ✅ CLOUDINARY CONFIG (DONE!)
 const cloudinaryConfig = {
-    cloudName: "YOUR_CLOUD_NAME",           // Cloudinary Dashboard se copy karo
-    uploadPreset: "YOUR_UPLOAD_PRESET"      // Settings > Upload > Upload Presets (Unsigned)
+    cloudName: "dpz8dkdvk",
+    uploadPreset: "Photos"
 };
 
 // Initialize Firebase (Auth + Firestore only, NO Storage needed!)

@@ -3,7 +3,10 @@
 // ============================================================
 
 // Firebase SDK references (initialized from firebase-config.js)
-const { auth, db, storage } = window.firebaseServices;
+const { auth, db } = window.firebaseServices;
+
+// Cloudinary upload function
+const { uploadToCloudinary, deleteFromCloudinary } = window.cloudinaryUpload;
 
 // Import Firebase functions
 const {
@@ -25,13 +28,6 @@ const {
     orderBy,
     serverTimestamp
 } = window.firebaseFirestore;
-
-const {
-    ref,
-    uploadBytesResumable,
-    getDownloadURL,
-    deleteObject
-} = window.firebaseStorage;
 
 // ============================================================
 // STATE MANAGEMENT
@@ -374,7 +370,7 @@ function renderMedia() {
                     <button onclick="event.stopPropagation(); downloadImage('${item.url}', '${escapeHtml(item.fileName)}')" title="Download">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     </button>
-                    <button onclick="event.stopPropagation(); deleteMedia('${item.id}', '${item.storagePath}')" title="Delete">
+                    <button onclick="event.stopPropagation(); deleteMedia('${item.id}', '${item.publicId || ''}')" title="Delete">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
                 </div>
@@ -446,83 +442,62 @@ async function uploadFile(file) {
     const percentEl = document.getElementById('uploadPercent');
     progressEl.classList.remove('hidden');
 
-    const timestamp = Date.now();
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const storagePath = `users/${state.currentUser.uid}/photos/${timestamp}_${safeName}`;
-    const storageRef = ref(storage, storagePath);
-
-    return new Promise((resolve, reject) => {
-        const uploadTask = uploadBytesResumable(storageRef, file, {
-            contentType: file.type
+    try {
+        // Upload to Cloudinary (FREE - 25GB storage)
+        const result = await uploadToCloudinary(file, (progress) => {
+            barEl.style.width = progress + '%';
+            percentEl.textContent = progress + '%';
         });
 
-        uploadTask.on('state_changed',
-            (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                barEl.style.width = progress + '%';
-                percentEl.textContent = Math.round(progress) + '%';
-            },
-            (error) => {
-                progressEl.classList.add('hidden');
-                barEl.style.width = '0%';
-                state.isUploading = false;
-                showToast('Upload failed: ' + error.message, 'error');
-                reject(error);
-            },
-            async () => {
-                try {
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        // Save metadata to Firestore (FREE)
+        await addDoc(collection(db, 'media'), {
+            userId: state.currentUser.uid,
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            url: result.url,
+            publicId: result.publicId,
+            width: result.width,
+            height: result.height,
+            folderId: state.currentView === 'folder' ? state.currentFolder : null,
+            folderName: state.currentView === 'folder' ? 
+                (state.folders.find(f => f.id === state.currentFolder)?.name || null) : null,
+            createdAt: serverTimestamp()
+        });
 
-                    // Save metadata to Firestore
-                    await addDoc(collection(db, 'media'), {
-                        userId: state.currentUser.uid,
-                        fileName: file.name,
-                        fileType: file.type,
-                        fileSize: file.size,
-                        url: downloadURL,
-                        storagePath: storagePath,
-                        folderId: state.currentView === 'folder' ? state.currentFolder : null,
-                        folderName: state.currentView === 'folder' ? 
-                            (state.folders.find(f => f.id === state.currentFolder)?.name || null) : null,
-                        createdAt: serverTimestamp()
-                    });
-
-                    // Update folder count if uploading to a folder
-                    if (state.currentView === 'folder' && state.currentFolder) {
-                        const folder = state.folders.find(f => f.id === state.currentFolder);
-                        if (folder) {
-                            await updateDoc(doc(db, 'folders', state.currentFolder), {
-                                count: (folder.count || 0) + 1
-                            });
-                        }
-                    }
-
-                    progressEl.classList.add('hidden');
-                    barEl.style.width = '0%';
-                    state.isUploading = false;
-                    showToast('Photo uploaded successfully', 'success');
-                    resolve();
-                } catch (error) {
-                    progressEl.classList.add('hidden');
-                    state.isUploading = false;
-                    showToast('Failed to save photo data', 'error');
-                    reject(error);
-                }
+        // Update folder count if uploading to a folder
+        if (state.currentView === 'folder' && state.currentFolder) {
+            const folder = state.folders.find(f => f.id === state.currentFolder);
+            if (folder) {
+                await updateDoc(doc(db, 'folders', state.currentFolder), {
+                    count: (folder.count || 0) + 1
+                });
             }
-        );
-    });
+        }
+
+        progressEl.classList.add('hidden');
+        barEl.style.width = '0%';
+        state.isUploading = false;
+        showToast('Photo uploaded successfully', 'success');
+    } catch (error) {
+        progressEl.classList.add('hidden');
+        barEl.style.width = '0%';
+        state.isUploading = false;
+        showToast('Upload failed: ' + error.message, 'error');
+    }
 }
 
 
 // ============================================================
 // MEDIA ACTIONS (Delete, Move, Download)
 // ============================================================
-async function deleteMedia(mediaId, storagePath) {
+async function deleteMedia(mediaId, publicId) {
     if (!confirm('Delete this photo permanently?')) return;
     try {
-        // Delete from Storage
-        const storageRef = ref(storage, storagePath);
-        await deleteObject(storageRef);
+        // Remove from Cloudinary (note: free tier keeps CDN copy)
+        if (publicId) {
+            await deleteFromCloudinary(publicId);
+        }
 
         // Delete from Firestore
         await deleteDoc(doc(db, 'media', mediaId));

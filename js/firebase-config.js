@@ -1,16 +1,19 @@
 // ============================================================
-// Firebase Configuration - PhotoVault
+// Firebase + Cloudinary Configuration - PhotoVault
 // ============================================================
-// IMPORTANT: Replace the values below with your own Firebase project config.
-// 
-// To get your config:
-// 1. Go to https://console.firebase.google.com/
-// 2. Create a new project (or select existing)
-// 3. Add a Web App (click </> icon)
-// 4. Copy your firebaseConfig object here
-// 5. Enable Authentication (Email/Password) in Firebase Console
-// 6. Create a Firestore Database (start in test mode)
-// 7. Enable Cloud Storage in Firebase Console
+// Firebase: Authentication + Firestore (FREE)
+// Cloudinary: Image Storage (25GB FREE)
+//
+// SETUP:
+// 1. Firebase Console: https://console.firebase.google.com/
+//    - Create project → Add Web App → Copy config below
+//    - Enable Authentication (Email/Password)
+//    - Create Firestore Database (test mode)
+//
+// 2. Cloudinary: https://cloudinary.com/
+//    - Create FREE account
+//    - Dashboard se "Cloud Name" copy karo
+//    - Settings > Upload > Add Upload Preset (Unsigned) → preset name copy karo
 //
 // Firestore Rules (paste in Firebase Console > Firestore > Rules):
 // ----------------------------------------------------------------
@@ -27,23 +30,11 @@
 //     }
 //   }
 // }
-//
-// Storage Rules (paste in Firebase Console > Storage > Rules):
-// ----------------------------------------------------------------
-// rules_version = '2';
-// service firebase.storage {
-//   match /b/{bucket}/o {
-//     match /users/{userId}/{allPaths=**} {
-//       allow read, write: if request.auth != null && request.auth.uid == userId;
-//     }
-//   }
-// }
 // ============================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 // ⚠️ REPLACE WITH YOUR FIREBASE CONFIG ⚠️
 const firebaseConfig = {
@@ -56,14 +47,19 @@ const firebaseConfig = {
   measurementId: "G-FTRFE4CS5J"
 };
 
-// Initialize Firebase
+// ⚠️ REPLACE WITH YOUR CLOUDINARY CONFIG ⚠️
+const cloudinaryConfig = {
+    cloudName: "YOUR_CLOUD_NAME",           // Cloudinary Dashboard se copy karo
+    uploadPreset: "YOUR_UPLOAD_PRESET"      // Settings > Upload > Upload Presets (Unsigned)
+};
+
+// Initialize Firebase (Auth + Firestore only, NO Storage needed!)
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 // Export services and functions for app.js
-window.firebaseServices = { auth, db, storage };
+window.firebaseServices = { auth, db };
+window.cloudinaryConfig = cloudinaryConfig;
 window.firebaseAuth = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged };
 window.firebaseFirestore = { collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, where, orderBy, serverTimestamp };
-window.firebaseStorage = { ref, uploadBytesResumable, getDownloadURL, deleteObject };

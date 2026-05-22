@@ -1,188 +1,132 @@
-# PhotoVault - Premium Web Gallery
+# PhotoVault - Premium Web Gallery (100% FREE)
 
-A modern, premium web-based gallery application built with Vanilla JavaScript, Tailwind CSS, and Firebase.
+A modern, premium web-based gallery application built with Vanilla JavaScript, Tailwind CSS, Firebase (Auth + Firestore) and **Cloudinary** (FREE image storage).
+
+## 💰 Cost: ₹0 (ZERO)
+
+| Service | Free Limit | Used For |
+|---------|-----------|----------|
+| **Firebase Auth** | Unlimited users | Login/Register |
+| **Firebase Firestore** | 1 GB storage, 50K reads/day | Photo metadata, albums |
+| **Cloudinary** | 25 GB storage, 25 GB bandwidth/month | Image hosting |
+| **Vercel** | 100 GB bandwidth/month | Website hosting |
+
+---
 
 ## Features
 
 - **Authentication** - Email/password sign in & registration via Firebase Auth
 - **Photo Upload** - Drag & drop or click-to-upload with progress bar (images only)
+- **Cloudinary Storage** - 25GB FREE image hosting with auto-optimization
 - **Album Management** - Create, delete, and organize photos into custom albums
 - **Masonry Grid** - Beautiful responsive masonry layout
 - **Lightbox** - Full-screen image viewer with keyboard navigation
 - **Dark/Light Mode** - Toggle with localStorage persistence
 - **Search** - Filter photos by filename
 - **Responsive** - Works seamlessly on mobile and desktop
-- **Vercel Ready** - One-click deploy to Vercel
-
-## Tech Stack
-
-- HTML5 + Vanilla JavaScript (ES6+ Modules)
-- Tailwind CSS (CDN)
-- Firebase Authentication
-- Firebase Cloud Firestore
-- Firebase Cloud Storage
-- Vercel (Hosting/Deployment)
+- **Vercel Ready** - One-click deploy
 
 ---
 
-## 🚀 Deploy to Vercel (Live karna)
+## 🚀 Quick Start (5 Minutes Setup)
 
-### Method 1: One-Click Deploy (Sabse Easy)
+### Step 1: Cloudinary Account (FREE)
 
-1. Apna repo GitHub pe push karo
-2. Go to **[vercel.com/new](https://vercel.com/new)**
-3. **"Import Git Repository"** click karo
-4. Apna repo select karo: `AAKASH-CODES-CODE/Photos`
-5. Settings me:
-   - **Framework Preset:** `Other`
-   - **Root Directory:** `./` (default)
-   - **Build Command:** (khali chhod do)
-   - **Output Directory:** (khali chhod do)
-6. **"Deploy"** click karo ✅
+1. Go to [cloudinary.com](https://cloudinary.com/) → **Sign Up Free**
+2. Dashboard se **Cloud Name** copy karo
+3. **Settings** → **Upload** → **Upload Presets** section
+4. **"Add Upload Preset"** click karo:
+   - **Signing Mode:** `Unsigned` ⚠️ (important!)
+   - **Folder:** `photovault`
+   - **Save** karo
+5. Jo preset name mila (e.g., `ml_default` ya custom name), wo copy karo
 
-> 2-3 minute me live ho jayega! URL milega jaise: `https://photos-xyz.vercel.app`
+### Step 2: Firebase Project (FREE)
 
-### Method 2: Vercel CLI se Deploy
+1. Go to [console.firebase.google.com](https://console.firebase.google.com/)
+2. **"Add Project"** → naam do → create karo
+3. Web app add karo (`</>` icon) → config copy karo
+4. **Authentication** → Sign-in method → **Email/Password** enable karo
+5. **Firestore Database** → Create database → **Start in test mode**
 
-```bash
-# Step 1: Vercel CLI install karo
-npm install -g vercel
+### Step 3: Config Update karo
 
-# Step 2: Project folder me jao
-cd Photos
-
-# Step 3: Login karo
-vercel login
-
-# Step 4: Deploy karo (Preview)
-vercel
-
-# Step 5: Production deploy
-vercel --prod
-```
-
-### Method 3: Python Script se Deploy
-
-```bash
-# Interactive wizard chalao
-python setup_firebase.py
-
-# Ya directly deploy karo
-python setup_firebase.py --deploy
-```
-
----
-
-## 🔧 Setup Instructions
-
-### 1. Create a Firebase Project
-
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Click "Add project" and follow the wizard
-3. Once created, click the web icon (`</>`) to add a web app
-4. Copy your `firebaseConfig` object
-
-### 2. Configure the App (2 Methods)
-
-#### Method A: Python Script (Recommended)
-```bash
-python setup_firebase.py --generate-config
-```
-Ye interactive prompt dega — bas apni Firebase values paste karo.
-
-#### Method B: Manual
-Open `js/firebase-config.js` and replace the placeholder values:
+Open `js/firebase-config.js` and replace values:
 
 ```javascript
+// Firebase Config
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "APNI_API_KEY",
+    authDomain: "APNA_PROJECT.firebaseapp.com",
+    projectId: "APNA_PROJECT_ID",
+    storageBucket: "APNA_PROJECT.appspot.com",
+    messagingSenderId: "APNA_SENDER_ID",
+    appId: "APNA_APP_ID"
+};
+
+// Cloudinary Config
+const cloudinaryConfig = {
+    cloudName: "APNA_CLOUD_NAME",
+    uploadPreset: "APNA_UPLOAD_PRESET"
 };
 ```
 
-### 3. Enable Firebase Services
-
-In the Firebase Console:
-
-- **Authentication** → Sign-in method → Enable "Email/Password"
-- **Firestore Database** → Create database → Start in test mode
-- **Storage** → Get started → Start in test mode
-
-### 4. Set Security Rules
-
-Generate rules automatically:
-```bash
-python setup_firebase.py --generate-rules
-```
-
-Or manually copy:
-
-#### Firestore Rules:
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /media/{document} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-    }
-    match /folders/{document} {
-      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-    }
-  }
-}
-```
-
-#### Storage Rules:
-```
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /users/{userId}/{allPaths=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-```
-
-### 5. Run Locally
+### Step 4: Deploy to Vercel
 
 ```bash
-# Using Python
-python -m http.server 8000
+# Option A: CLI
+npm install -g vercel
+vercel --prod
 
-# Using Node.js
-npx serve .
-
-# Using package.json script
-npm start
+# Option B: Website
+# vercel.com/new → Import GitHub repo → Deploy
 ```
 
-Then open `http://localhost:8000` in your browser.
+### Step 5: Done! 🎉
 
 ---
 
 ## 🐍 Python Setup Script
 
-`setup_firebase.py` ek interactive wizard hai jo sab kuch manage karta hai:
+Interactive wizard jo sab automatically karta hai:
 
 ```bash
 # Full interactive menu
 python setup_firebase.py
 
 # Individual commands
-python setup_firebase.py --generate-config   # Firebase config generate karo
-python setup_firebase.py --generate-rules    # Security rules generate karo
-python setup_firebase.py --validate          # Config validate karo
-python setup_firebase.py --deploy            # Vercel pe deploy karo (prod)
-python setup_firebase.py --deploy-preview    # Vercel pe preview deploy
-python setup_firebase.py --help              # Help dikhao
+python setup_firebase.py --generate-config    # Firebase + Cloudinary config
+python setup_firebase.py --generate-rules     # Firestore security rules
+python setup_firebase.py --validate           # Config check karo
+python setup_firebase.py --deploy             # Vercel pe deploy (prod)
+python setup_firebase.py --help               # Help
 ```
+
+---
+
+## 🔐 Firestore Security Rules
+
+Firebase Console → Firestore → Rules me paste karo:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /media/{document} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    match /folders/{document} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+  }
+}
+```
+
+> ⚠️ Firebase Storage rules ki ab zaroorat NAHI hai — hum Cloudinary use kar rahe hain!
 
 ---
 
@@ -191,43 +135,100 @@ python setup_firebase.py --help              # Help dikhao
 ```
 Photos/
 ├── index.html              # Main HTML with complete UI
-├── vercel.json             # Vercel deployment configuration
+├── vercel.json             # Vercel deployment config
 ├── package.json            # Node.js package config
-├── setup_firebase.py       # Python setup & deploy script
+├── setup_firebase.py       # Python setup & deploy wizard
 ├── css/
-│   └── styles.css          # Custom CSS (masonry, animations, transitions)
+│   └── styles.css          # Custom CSS (masonry, animations)
 ├── js/
-│   ├── firebase-config.js  # Firebase initialization & config
+│   ├── firebase-config.js  # Firebase + Cloudinary config
+│   ├── cloudinary-upload.js # Cloudinary upload module (FREE)
 │   └── app.js              # Main application logic
-├── assets/                 # Static assets (if needed)
+├── assets/                 # Static assets
 └── README.md               # This file
 ```
 
 ---
 
-## ⚡ Quick Start (TL;DR)
+## 🏗️ Architecture
 
-```bash
-# 1. Firebase config set karo
-python setup_firebase.py --generate-config
-
-# 2. Security rules generate karo
-python setup_firebase.py --generate-rules
-
-# 3. Locally test karo
-python -m http.server 8000
-
-# 4. Vercel pe live karo
-vercel --prod
+```
+┌─────────────────────────────────────────────┐
+│                  Browser                      │
+│  ┌─────────┐  ┌──────────┐  ┌───────────┐  │
+│  │  HTML   │  │  Tailwind │  │  Vanilla  │  │
+│  │  + UI   │  │    CSS    │  │    JS     │  │
+│  └─────────┘  └──────────┘  └───────────┘  │
+└───────────┬────────────────────┬────────────┘
+            │                    │
+    ┌───────▼───────┐   ┌───────▼───────┐
+    │   Firebase    │   │  Cloudinary   │
+    │  (FREE)       │   │  (FREE)       │
+    │               │   │               │
+    │ • Auth        │   │ • 25GB Storage│
+    │ • Firestore   │   │ • Auto CDN   │
+    │   (metadata)  │   │ • Optimize   │
+    └───────────────┘   └───────────────┘
 ```
 
 ---
 
-## Upload Restrictions
+## ⚡ Upload Flow
 
-- **Only image files** are allowed: `.jpg`, `.png`, `.webp`, `.gif`, `.bmp`, `.svg`
-- **Video uploads are blocked** — attempting to upload a video shows an error toast
-- File validation happens both on selection and before upload
+1. User selects image → **File type validated** (video blocked!)
+2. Image uploaded to **Cloudinary** (progress bar shown)
+3. Cloudinary returns **secure URL + public_id**
+4. Metadata saved to **Firestore** (url, filename, folder, timestamp)
+5. Gallery refreshes automatically ✅
+
+---
+
+## 🚫 Upload Restrictions
+
+- **Only image files** allowed: `.jpg`, `.png`, `.webp`, `.gif`, `.bmp`, `.svg`
+- **Video uploads BLOCKED** — shows error toast: "Video uploads are not supported"
+- Double validation: once on file select, once before upload
+
+---
+
+## 🌐 Deploy to Vercel
+
+### Method 1: One-Click (Easiest)
+1. [vercel.com/new](https://vercel.com/new)
+2. Import `AAKASH-CODES-CODE/Photos`
+3. Framework: `Other`
+4. Deploy ✅
+
+### Method 2: CLI
+```bash
+npm install -g vercel
+vercel login
+vercel --prod
+```
+
+### Method 3: Python Script
+```bash
+python setup_firebase.py --deploy
+```
+
+---
+
+## 🔧 Local Development
+
+```bash
+# Python server
+python -m http.server 8000
+
+# Or Node.js
+npx serve . -l 3000
+
+# Or package.json script
+npm start
+```
+
+Open `http://localhost:8000`
+
+---
 
 ## License
 

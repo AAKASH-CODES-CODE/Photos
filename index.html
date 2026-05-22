@@ -254,9 +254,7 @@
     <!-- Sidebar Overlay (mobile) -->
     <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
 
-    <!-- Scripts -->
-    <script type="module" src="js/firebase-config.js"></script>
-    <script type="module" src="js/cloudinary-upload.js"></script>
+    <!-- Scripts - Single module, no loading order issues -->
     <script type="module" src="js/app.js"></script>
 </body>
 </html>

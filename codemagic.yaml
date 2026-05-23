@@ -7,29 +7,13 @@ workflows:
     environment:
       flutter: stable
     scripts:
-      - name: Fix Android v1 Embedding (Auto-Upgrade)
+      - name: Fix Android v1 Embedding
         script: |
           rm -rf android
           flutter create --platforms=android .
-      - name: Setup Gradle Memory & Compile 36
-        script: |
-          echo "org.gradle.jvmargs=-Xmx3072m -Dfile.encoding=UTF-8" > android/gradle.properties
-          echo "org.gradle.daemon=false" >> android/gradle.properties
-          cat << 'EOF' >> android/build.gradle
-          
-          subprojects {
-              afterEvaluate { project ->
-                  if (project.hasProperty('android')) {
-                      project.android {
-                          compileSdkVersion 36
-                      }
-                  }
-              }
-          }
-          EOF
       - name: Get Flutter Packages
         script: flutter pub get
-      - name: Build Android APK (Catch Exact Error)
-        script: flutter build apk --release --verbose
+      - name: Build Android APK (Debug Mode)
+        script: flutter build apk --debug
     artifacts:
-      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/flutter-apk/app-debug.apk

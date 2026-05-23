@@ -6,7 +6,7 @@ workflows:
     max_build_duration: 120
     environment:
       flutter: stable
-        scripts:
+    scripts:
       - name: Fix Android v1 Embedding (Auto-Upgrade)
         script: |
           rm -rf android

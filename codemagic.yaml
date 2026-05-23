@@ -1,12 +1,16 @@
 workflows:
   my-flutter-workflow:
     name: Build Android APK
-    working_directory: photovault_flutter  # <--- YE LINE YAHAN ADD KAREIN
+    # working_directory: aapke_folder_ka_naam (Jo aapne pehle set kiya tha, use waise hi rehne dein)
     instance_type: mac_mini_m1
     max_build_duration: 120
     environment:
       flutter: stable
     scripts:
+      - name: Fix Android v1 Embedding (Auto-Upgrade)
+        script: |
+          rm -rf android
+          flutter create --platforms=android .
       - name: Get Flutter Packages
         script: flutter pub get
       - name: Build Android APK

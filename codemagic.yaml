@@ -1,6 +1,7 @@
 workflows:
   my-flutter-workflow:
     name: Build Android APK
+    working_directory: aapke_folder_ka_naam  # <--- YE LINE YAHAN ADD KAREIN
     instance_type: mac_mini_m1
     max_build_duration: 120
     environment:

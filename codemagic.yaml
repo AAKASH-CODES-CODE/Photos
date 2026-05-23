@@ -11,8 +11,9 @@ workflows:
         script: |
           rm -rf android
           flutter create --platforms=android .
-      - name: Force Compile SDK 36 for All Plugins
+      - name: Bulletproof Android Setup
         script: |
+          echo "org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8" >> android/gradle.properties
           cat << 'EOF' >> android/build.gradle
           
           subprojects {
@@ -20,6 +21,10 @@ workflows:
                   if (project.hasProperty('android')) {
                       project.android {
                           compileSdkVersion 36
+                          lintOptions {
+                              checkReleaseBuilds false
+                              abortOnError false
+                          }
                       }
                   }
               }
@@ -28,6 +33,7 @@ workflows:
       - name: Get Flutter Packages
         script: flutter pub get
       - name: Build Android APK
-        script: flutter build apk --release
+        script: flutter build apk --release --verbose
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
+      

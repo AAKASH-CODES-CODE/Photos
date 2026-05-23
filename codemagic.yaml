@@ -11,8 +11,10 @@ workflows:
         script: |
           rm -rf android
           flutter create --platforms=android .
-      - name: Force Compile SDK 36 for All Plugins
+      - name: Setup Gradle Memory & Compile 36
         script: |
+          echo "org.gradle.jvmargs=-Xmx3072m -Dfile.encoding=UTF-8" > android/gradle.properties
+          echo "org.gradle.daemon=false" >> android/gradle.properties
           cat << 'EOF' >> android/build.gradle
           
           subprojects {
@@ -27,7 +29,7 @@ workflows:
           EOF
       - name: Get Flutter Packages
         script: flutter pub get
-      - name: Build Android APK (Ignore Fake Errors)
-        script: flutter build apk --release --no-tree-shake-icons || true
+      - name: Build Android APK (Catch Exact Error)
+        script: flutter build apk --release --verbose
     artifacts:
-      - build/**/outputs/**/*.apk
+      - build/app/outputs/flutter-apk/app-release.apk

@@ -6,13 +6,19 @@ workflows:
     max_build_duration: 120
     environment:
       flutter: stable
-    scripts:
+        scripts:
       - name: Fix Android v1 Embedding (Auto-Upgrade)
         script: |
           rm -rf android
           flutter create --platforms=android .
       - name: Get Flutter Packages
         script: flutter pub get
+      - name: Update compileSdk to 34
+        script: |
+          sed -i '' 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/g' android/app/build.gradle || true
+          sed -i '' 's/compileSdk flutter.compileSdkVersion/compileSdk 34/g' android/app/build.gradle || true
+          sed -i '' 's/compileSdkVersion 33/compileSdkVersion 34/g' android/app/build.gradle || true
+          sed -i '' 's/compileSdk 33/compileSdk 34/g' android/app/build.gradle || true
       - name: Build Android APK
         script: flutter build apk --release
     artifacts:

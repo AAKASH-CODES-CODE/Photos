@@ -11,15 +11,24 @@ workflows:
         script: |
           rm -rf android
           flutter create --platforms=android .
+      - name: Force Compile SDK 34 for All Plugins
+        script: |
+          cat << 'EOF' >> android/build.gradle
+          
+          subprojects {
+              afterEvaluate { project ->
+                  if (project.hasProperty('android')) {
+                      project.android {
+                          compileSdkVersion 34
+                      }
+                  }
+              }
+          }
+          EOF
       - name: Get Flutter Packages
         script: flutter pub get
-      - name: Update compileSdk to 34
-        script: |
-          sed -i '' 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 34/g' android/app/build.gradle || true
-          sed -i '' 's/compileSdk flutter.compileSdkVersion/compileSdk 34/g' android/app/build.gradle || true
-          sed -i '' 's/compileSdkVersion 33/compileSdkVersion 34/g' android/app/build.gradle || true
-          sed -i '' 's/compileSdk 33/compileSdk 34/g' android/app/build.gradle || true
       - name: Build Android APK
         script: flutter build apk --release
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
+      

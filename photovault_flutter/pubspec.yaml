@@ -1,0 +1,41 @@
+name: photovault_flutter
+description: Auto-backup photo gallery app like Google Photos
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Device photos access
+  photo_manager: ^3.0.0
+
+  # HTTP for Cloudinary upload
+  http: ^1.1.0
+  dio: ^5.4.0
+
+  # Local storage for tracking uploaded photos
+  shared_preferences: ^2.2.2
+
+  # Network status check
+  connectivity_plus: ^5.0.2
+
+  # Cached network images
+  cached_network_image: ^3.3.0
+
+  # Permissions
+  permission_handler: ^11.1.0
+
+  # Photo viewer with zoom
+  photo_view: ^0.14.0
+
+dev_dependencies:
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

@@ -11,7 +11,7 @@ workflows:
         script: |
           rm -rf android
           flutter create --platforms=android .
-      - name: Force Compile SDK 34 for All Plugins
+      - name: Force Compile SDK 36 for All Plugins
         script: |
           cat << 'EOF' >> android/build.gradle
           
@@ -19,7 +19,7 @@ workflows:
               afterEvaluate { project ->
                   if (project.hasProperty('android')) {
                       project.android {
-                          compileSdkVersion 34
+                          compileSdkVersion 36
                       }
                   }
               }
@@ -31,4 +31,3 @@ workflows:
         script: flutter build apk --release
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
-      
